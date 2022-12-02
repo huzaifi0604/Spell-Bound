@@ -87,7 +87,7 @@
     ></script>
     <script type="text/javascript" charset="utf-8">
       clients=[]
-
+      i = 0
       $(document).ready(function () {
         namespace = "/botnet";
         var socket = io(namespace);
@@ -95,10 +95,10 @@
         socket.on("connect", function () {
           socket.emit("my_event", { data: "Connected" });
         });
-        i = 0
         socket.on("connected_clients", function(msg, cb){
           
           clients=msg.data
+          console.log(clients)
           var select = document.getElementById("client");
           var opt = clients.at(-1);
           opt += i;

